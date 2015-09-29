@@ -36,8 +36,12 @@ void loop() {
   //convert radians into degrees
   pitch = pitch * (180.0/PI);
   roll = roll * (180.0/PI) ;
-  
-  
+
+  uint16_t batteryReading =  Bean.getBatteryVoltage(); 
+  float joystickY = analogRead(A0);
+  float joystickX = analogRead(A1);
+  int joyClick = !digitalRead(0);
+    
   serialDataPrint(pitch, roll);
   
   // Print Pitch and Roll Angles
@@ -48,7 +52,17 @@ void loop() {
   dtostrf(roll,5,2,rollBuffer);
   stringToPrint = stringToPrint + "Pitch: " + pitchBuffer + "\tRoll: " + rollBuffer;
   Serial.println(stringToPrint);
-
+  
+  stringToPrint = String();
+  char battBuffer [8];
+  char joyYBuffer [8];
+  char joyXBuffer [8];
+  dtostrf(batteryReading,5,2,battBuffer);
+  dtostrf(joystickY,5,2,joyYBuffer);
+  dtostrf(joystickX,5,2,joyXBuffer);
+  stringToPrint = stringToPrint + "joyY: " + joyYBuffer + "\tjoyX: " + joyXBuffer + "\tClx: " + joyClick + "\nBatt: " + battBuffer;
+  Serial.println(stringToPrint);
+  Serial.println("");
   
   Bean.sleep(500);
 }
@@ -57,12 +71,12 @@ void loop() {
 void serialDataPrint(float pitch, float roll) {
   //http://www.varesano.net/blog/fabio/sending-float-variables-over-serial-without-loss-precision-arduino-and-processing
   
-  byte * b = (byte *) &pitch;
-  Serial.print("f:");
-  Serial.write(b[0]);
-  Serial.write(b[1]);
-  Serial.write(b[2]);
-  Serial.write(b[3]);
+//  byte * b = (byte *) &pitch;
+//  Serial.print("f:");
+//  Serial.write(b[0]);
+//  Serial.write(b[1]);
+//  Serial.write(b[2]);
+//  Serial.write(b[3]);
   
 
 //  byte * c = (byte *) &roll;
