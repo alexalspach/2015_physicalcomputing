@@ -62,7 +62,7 @@ int prev_color_mode = 0;
 int color_mode = 0;
 color bg = color(255, 255, 255);
 color c = color(0, 0, 0);    
-    
+
 
 void setup() {
   //fullScreen();
@@ -79,33 +79,11 @@ void draw () {
   //background(150);
   background(bg);
   lights();
-  
-  
-  //Serial test
-  if(myPort.available() > 0) {
-    char inByte = myPort.readChar();
-    if(inByte == 'f') {
-      // we expect data with this format f:XXXX
-      myPort.readChar(); // discard ':'
-      byte [] pitchData = new byte[4];
-      byte [] rollData = new byte[4];
-      myPort.readBytes(pitchData);
-      //myPort.readBytes(rollData);
-      
-      int intbit = 0;
-      intbit = (pitchData[3] << 24) | ((pitchData[2] & 0xff) << 16) | ((pitchData[1] & 0xff) << 8) | (pitchData[0] & 0xff);
-      float pitch = Float.intBitsToFloat(intbit);
-      
-      //intbit = 0;
-      //intbit = (rollData[3] << 24) | ((rollData[2] & 0xff) << 16) | ((rollData[1] & 0xff) << 8) | (rollData[0] & 0xff);
-      //float roll = Float.intBitsToFloat(intbit);
-      
-      println("Pitch: ", pitch);
-      //println("Pitch: ", pitch, "Roll: ", roll);
-    }
-  }
-  
-  
+
+
+  getSerial(4);
+
+
   ///////
 
 
@@ -113,7 +91,7 @@ void draw () {
   float mouse_mappings[] = mouseMapping(); //  { forward velocity, rotational velocity } 0-255
 
   input_yaw = map(mouse_mappings[0], 0, 255, -rotateK_max, rotateK_max);
-  input_pitch = map(mouse_mappings[1], 0 , 255, -rotateK_max, rotateK_max);
+  input_pitch = map(mouse_mappings[1], 0, 255, -rotateK_max, rotateK_max);
   //input_X = map(someInput1, 0 , 255, 0, moveK_max);
   //input_Z = map(someInput2, 0 , 255, 0, moveK_max);
 
@@ -131,7 +109,7 @@ void draw () {
   sphere(30);
 
 
-  body_pose = updateCamera(moveK_max, moveK_max, input_pitch,  input_yaw );
+  body_pose = updateCamera(moveK_max, moveK_max, input_pitch, input_yaw );
   //body_pose = updateCamera(input_X, input_Z, input_pitch,  input_yaw );
   randomBoxes(body_pose);
 
@@ -222,7 +200,7 @@ float[] updateCamera(float moveKx, float moveKz, float rotateKpitch, float rotat
   //  rotangleYaw += rotateKyaw*PI;
   //  moveangle -= rotateKyaw*PI;
   //}
-  
+
   rotanglePitch -= rotateKpitch*PI;
   rotangleYaw += rotateKyaw*PI;
   moveangle -= rotateKyaw*PI;
@@ -230,29 +208,25 @@ float[] updateCamera(float moveKx, float moveKz, float rotateKpitch, float rotat
 
   //println(rotangleYaw, rotanglePitch);
   //println(rotanglePitch % PI);
-  
+
   float angle_limit_margin = 0.05;
   if ( rotanglePitch >= (PI/2-angle_limit_margin) )  rotanglePitch = (PI/2 - angle_limit_margin);  
-if ( rotanglePitch <= (-PI/2+angle_limit_margin) )  rotanglePitch = (-PI/2 + angle_limit_margin);  
-//yaxis = 20;
+  if ( rotanglePitch <= (-PI/2+angle_limit_margin) )  rotanglePitch = (-PI/2 + angle_limit_margin);  
+  //yaxis = 20;
 
-//if ((abs(rotanglePitch)%(2*PI)) < (PI/2)) {
+  //if ((abs(rotanglePitch)%(2*PI)) < (PI/2)) {
   camera(  xaxis, yaxis, zaxis, 
-          xaxis+cos(rotangleYaw), yaxis+tan(rotanglePitch), zaxis+sin(rotangleYaw), 
-          0, 1, 0);
-//}
-//else{
-//   camera(  xaxis, yaxis, zaxis, 
-//         xaxis+cos(rotangleYaw), yaxis-tan(-rotanglePitch), zaxis+sin(rotangleYaw), 
-//         0, 1, 0);
-//}
+    xaxis+cos(rotangleYaw), yaxis+tan(rotanglePitch), zaxis+sin(rotangleYaw), 
+    0, 1, 0);
+  //}
+  //else{
+  //   camera(  xaxis, yaxis, zaxis, 
+  //         xaxis+cos(rotangleYaw), yaxis-tan(-rotanglePitch), zaxis+sin(rotangleYaw), 
+  //         0, 1, 0);
+  //}
 
   float[] body_pose = {xaxis, yaxis, zaxis};
   return body_pose;
-  
-  
-
-  
 }
 
 float[] mouseMapping() {
@@ -289,21 +263,21 @@ int randomBoxes(float[] body_pose) {
       //randomsY[i] = random(-spreadY, spreadY);
       //randomsZ[i] = random(-spreadZ, spreadZ);
       //randoms_size[i] = random(0, spread_size);
-      
+
       randomsX[i] = randomGaussian()*1000;
       randomsY[i] = randomGaussian()*300;
       randomsZ[i] = randomGaussian()*1000;
-      
+
       randoms_size[i] = randomGaussian()*spread_size;
-      
+
       //coins[i] = random(0, 1);
     }
-    
+
     prev_color_mode = color_mode;
     while (color_mode == prev_color_mode ) {
       color_mode = int(random(5)); // choose new color mode, cannot be the same as the previous color mode
     }
-    println("color mode:",color_mode);
+    println("color mode:", color_mode);
     switch_scene = false;
   }
 
@@ -311,9 +285,9 @@ int randomBoxes(float[] body_pose) {
 
   for (int i = 0; i < num_boxes; i++) {
 
-    
-    
-    
+
+
+
     pushMatrix();
     float boxX = randomsX[i];//width/2+randomsX[i];
     float boxY = randomsY[i];//height/2+randomsY[i];
@@ -321,11 +295,11 @@ int randomBoxes(float[] body_pose) {
     translate(boxX, boxY, boxZ);
 
     float distance = dist(boxX, boxY, boxZ, body_pose[0], body_pose[1], body_pose[2]);
-    
-    
+
+
     applyNewColors(distance);
 
-    
+
 
     fill(c);
 
@@ -351,76 +325,102 @@ void resetCamera() {
 }
 
 void applyNewColors(float distance) {
- 
-  float R,G,B;
+
+  float R, G, B;
 
   switch(color_mode) {
-   
-    case 0:
-      // 49 25 255
-      // 26 255 0
-      // 204 93 20
-      bg = color(49, 25, 255);
-      R = map(distance, 0, 2000, 26, 204);
-      G = map(distance, 0, 2000, 255, 93);
-      B = map(distance, 0, 2000, 0, 20);
-      break;
-    case 1:
-      //255 29 232
-      //4 255 231
-      //204 169 23    
-      bg = color(255, 29, 232);
-      R = map(distance, 0, 2000, 204, 4);
-      G = map(distance, 0, 2000, 169, 255);
-      B = map(distance, 0, 2000, 23, 231);
-      break;
-    case 2:
-      //255 104 76
-      //47 115 255
-      //142 204 17   
-      bg = color(255, 104, 76);
-      R = map(distance, 0, 2000, 47, 142);
-      G = map(distance, 0, 2000, 115, 204);
-      B = map(distance, 0, 2000, 255, 17);
-      break;     
-    case 3:
-      //219 255 249
-      //255 209 49
-      //202 17 204
-      bg = color(219, 255, 249);
-      R = map(distance, 0, 2000, 255, 202);
-      G = map(distance, 0, 2000, 209, 17);
-      B = map(distance, 0, 2000, 49, 204);
-      break;  
-    case 4:
-      bg = color(0, 0, 0);
-      R = map(distance, 0, 2000, 255, 0);
-      G = map(distance, 0, 2000, 255, 255);
-      B = map(distance, 0, 2000, 255, 0 );
-      break;        
-    default:
-      bg = color(255, 255, 255);
-      R = 100;
-      G = 100;
-      B = 100;
-      break;
+
+  case 0:
+    // 49 25 255
+    // 26 255 0
+    // 204 93 20
+    bg = color(49, 25, 255);
+    R = map(distance, 0, 2000, 26, 204);
+    G = map(distance, 0, 2000, 255, 93);
+    B = map(distance, 0, 2000, 0, 20);
+    break;
+  case 1:
+    //255 29 232
+    //4 255 231
+    //204 169 23    
+    bg = color(255, 29, 232);
+    R = map(distance, 0, 2000, 204, 4);
+    G = map(distance, 0, 2000, 169, 255);
+    B = map(distance, 0, 2000, 23, 231);
+    break;
+  case 2:
+    //255 104 76
+    //47 115 255
+    //142 204 17   
+    bg = color(255, 104, 76);
+    R = map(distance, 0, 2000, 47, 142);
+    G = map(distance, 0, 2000, 115, 204);
+    B = map(distance, 0, 2000, 255, 17);
+    break;     
+  case 3:
+    //219 255 249
+    //255 209 49
+    //202 17 204
+    bg = color(219, 255, 249);
+    R = map(distance, 0, 2000, 255, 202);
+    G = map(distance, 0, 2000, 209, 17);
+    B = map(distance, 0, 2000, 49, 204);
+    break;  
+  case 4:
+    bg = color(0, 0, 0);
+    R = map(distance, 0, 2000, 255, 0);
+    G = map(distance, 0, 2000, 255, 255);
+    B = map(distance, 0, 2000, 255, 0 );
+    break;        
+  default:
+    bg = color(255, 255, 255);
+    R = 100;
+    G = 100;
+    B = 100;
+    break;
   }
-  
+
+
+  c = color(R, G, B, map(distance, 0, 500, 0, 255));
+}
+
+
+//219 255 249
+//255 209 49
+//202 17 204
+
+
+int[] getSerial(int num_bytes) {
+
+  int[] packet = new int[num_bytes];
+
+  //Enough data available ?
+  if (myPort.available() > num_bytes) {
+
+    //delay(2);
+    int inByte0 = myPort.read();
+
+    // Start byte defined as 255 in Arduino and processing code (defined by me)
+    if ( inByte0 == 255 ) { 
+
+      for (int i = 0; i<4; i++) {
+        inByte0 = myPort.read();
+        packet[i] = inByte0;
+      }
       
-    c = color(R, G, B, map(distance, 0, 500, 0, 255));
-    
-    
+      
+      print( packet[0] );
+      print("\t");
+      print( packet[1] );
+      print("\t");
+      print( packet[2] );
+      print("\t");
+      print( packet[3] );
+      print("\n");
+      
+      
+    }
+  }
 
-  
-
-  
-  
-  //219 255 249
-  //255 209 49
-  //202 17 204
-  
-  
-  
-  
-  
+  return packet;
 }

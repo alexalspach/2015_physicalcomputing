@@ -38,65 +38,63 @@ void loop() {
   roll = roll * (180.0/PI) ;
 
   uint16_t batteryReading =  Bean.getBatteryVoltage(); 
-  float joystickY = analogRead(A0);
-  float joystickX = analogRead(A1);
-  int joyClick = !digitalRead(0);
+  int joystickY = analogRead(A0); // 0-255
+  int joystickX = analogRead(A1); // 0-255
+  int joyClick = !digitalRead(0); // 0-255
+  
+  int joystickY_0_254 = map(joystickY, 0, 1024, 0, 254);
+  int joystickX_0_254 = map(joystickX, 0, 1024, 0, 254);
+  int pitch_0_254 = map(pitch, -90.0, 90.0, 0, 254);
+  
+//  Serial.print(joystickY_0_254);
+//    Serial.print("\t");
+//  Serial.print(joystickX_0_254);
+//    Serial.print("\t");  
+//  Serial.print(pitch_0_254);
+//    Serial.print("\n");  
+      
     
-  serialDataPrint(pitch, roll);
+  // Requires data from 0 - 254 (255 reserved for packet header)
+  serialSend4(joystickY_0_254,joystickX_0_254,pitch_0_254,joyClick);
   
   // Print Pitch and Roll Angles
-  String stringToPrint = String();
-  char pitchBuffer [8];
-  char rollBuffer [8];
-  dtostrf(pitch,5,2,pitchBuffer);
-  dtostrf(roll,5,2,rollBuffer);
-  stringToPrint = stringToPrint + "Pitch: " + pitchBuffer + "\tRoll: " + rollBuffer;
-  Serial.println(stringToPrint);
+//  String stringToPrint = String();
+//  char pitchBuffer [8];
+//  char rollBuffer [8];
+//  dtostrf(pitch,5,2,pitchBuffer);
+//  dtostrf(roll,5,2,rollBuffer);
+//  stringToPrint = stringToPrint + "Pitch: " + pitchBuffer + "\tRoll: " + rollBuffer;
+//  Serial.println(stringToPrint);
+//  
+//  stringToPrint = String();
+//  char battBuffer [8];
+//  char joyYBuffer [8];
+//  char joyXBuffer [8];
+//  dtostrf(batteryReading,5,2,battBuffer);
+//  dtostrf(joystickY,5,2,joyYBuffer);
+//  dtostrf(joystickX,5,2,joyXBuffer);
+//  stringToPrint = stringToPrint + "joyY: " + joyYBuffer + "\tjoyX: " + joyXBuffer + "\tClx: " + joyClick + "\nBatt: " + battBuffer;
+//  Serial.println(stringToPrint);
+//  Serial.println("");
   
-  stringToPrint = String();
-  char battBuffer [8];
-  char joyYBuffer [8];
-  char joyXBuffer [8];
-  dtostrf(batteryReading,5,2,battBuffer);
-  dtostrf(joystickY,5,2,joyYBuffer);
-  dtostrf(joystickX,5,2,joyXBuffer);
-  stringToPrint = stringToPrint + "joyY: " + joyYBuffer + "\tjoyX: " + joyXBuffer + "\tClx: " + joyClick + "\nBatt: " + battBuffer;
-  Serial.println(stringToPrint);
-  Serial.println("");
-  
-  Bean.sleep(500);
+  Bean.sleep(5);
+
 }
 
 
-void serialDataPrint(float pitch, float roll) {
-  //http://www.varesano.net/blog/fabio/sending-float-variables-over-serial-without-loss-precision-arduino-and-processing
-  
-//  byte * b = (byte *) &pitch;
-//  Serial.print("f:");
-//  Serial.write(b[0]);
-//  Serial.write(b[1]);
-//  Serial.write(b[2]);
-//  Serial.write(b[3]);
-  
 
-//  byte * c = (byte *) &roll;
-//  Serial.write(c[0]);
-//  Serial.write(c[1]);
-//  Serial.write(c[2]);
-//  Serial.write(c[3]);
-//  
-  /* DEBUG */
-//  Serial.println();
-//  Serial.print(b[0],BIN);
-//  Serial.print(b[1], BIN);
-//  Serial.print(b[2], BIN);
-//  Serial.println(b[3], BIN);
-//  
-//    Serial.println();
-//  Serial.print(c[0],BIN);
-//  Serial.print(c[1], BIN);
-//  Serial.print(c[2], BIN);
-//  Serial.println(c[3], BIN);
-  //*/
+
+
+
+void serialSend4(int one, int two, int three, int four) {
+  
+  Serial.write(255); // start byte
+  Serial.write(one);
+  Serial.write(two);
+  Serial.write(three);
+  Serial.write(four);
+  
 }
+
+
 
