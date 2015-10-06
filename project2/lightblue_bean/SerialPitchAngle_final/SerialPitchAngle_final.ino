@@ -1,11 +1,11 @@
-/* 
-  This sketch reads the acceleration from the Bean's on-board accelerometer. 
-  
+/*
+  This sketch reads the acceleration from the Bean's on-board accelerometer.
+
   The acceleration readings are sent over serial and can be accessed in Arduino's Serial Monitor.
-  
+
   To use the Serial Monitor, set Arduino's serial port to "/tmp/tty.LightBlue-Bean"
   and the Bean as "Virtual Serial" in the OS X Bean Loader.
-    
+
   This example code is in the public domain.
 */
 
@@ -46,43 +46,43 @@ float pitch_offset = 0.0;
 
 void setup() {
   // Bean Serial is at a fixed baud rate. Changing the value in Serial.begin() has no effect.
-  Serial.begin();   
+  Serial.begin();
   // Optional: Use Bean.setAccelerationRange() to set the sensitivity to something other than the default of ±2g.
-  
+
   for (int thisReading = 0; thisReading < pitch_windowSize; thisReading++)
     pitch_data[thisReading] = 0;
   for (int thisReading = 0; thisReading < joyX_windowSize; thisReading++)
     joyX_data[thisReading] = 0;
   for (int thisReading = 0; thisReading < joyY_windowSize; thisReading++)
-    joyY_data[thisReading] = 0;    
-    
+    joyY_data[thisReading] = 0;
+
   int count = 0;
   float offset = 0.0;
-  for (int i=0; i<500; i++) {
-   offset += analogRead(joyY_pin);
-   count++;
-   //delay(1);
+  for (int i = 0; i < 100; i++) {
+    offset += analogRead(joyY_pin);
+    count++;
+    //delay(1);
   }
   joyY_offset = offset / count;
-  joyY_offset = (1024/2) - joyY_offset;
+  joyY_offset = (1024 / 2) - joyY_offset;
   Serial.println(joyY_offset);
-  
+
   count = 0;
   offset = 0.0;
-  for (int i=0; i<500; i++) {
-   offset += analogRead(joyX_pin);
-   count++;
-   //delay(1);
+  for (int i = 0; i < 100; i++) {
+    offset += analogRead(joyX_pin);
+    count++;
+    //delay(1);
   }
   joyX_offset = offset / count;
   Serial.println("here");
   Serial.println(joyX_offset);
-  joyX_offset = (1024/2) - joyX_offset;
+  joyX_offset = (1024 / 2) - joyX_offset;
   Serial.println(joyX_offset);
-  
+
   count = 0;
   offset = 0.0;
-  for (int i=0; i<500; i++) {
+  for (int i = 0; i < 100; i++) {
     acceleration = Bean.getAcceleration();
     calcPitchRoll(acceleration);
     offset += pitch;
@@ -93,63 +93,63 @@ void setup() {
   //Serial.println("here");
   //Serial.println(pitch_offset);
   pitch_offset = 0.0 - pitch_offset;
-  
-  
-    
+
+
+
 }
 
 void loop() {
-  // Get the current acceleration with range of ±2g, and a conversion of 3.91×10-3 g/unit or 0.03834(m/s^2)/units. 
+  // Get the current acceleration with range of ±2g, and a conversion of 3.91×10-3 g/unit or 0.03834(m/s^2)/units.
   //AccelerationReading acceleration = Bean.getAcceleration();
   acceleration = Bean.getAcceleration();
   calcPitchRoll(acceleration);
   pitch += pitch_offset;
   //Serial.println(pitch);
-  
-  //uint16_t batteryReading =  Bean.getBatteryVoltage(); 
+
+  //uint16_t batteryReading =  Bean.getBatteryVoltage();
   int joystickY = analogRead(joyY_pin) + joyY_offset; // 0-1023
-  if (joystickY>1023) joystickY = 1023;
-  if (joystickY<0) joystickY = 0;
+  if (joystickY > 1023) joystickY = 1023;
+  if (joystickY < 0) joystickY = 0;
   if ( abs(joystickY - 512 ) < 5 ) joystickY = 512; // dead zone at center
   //Serial.println(joystickY);
-  
+
   int joystickX = analogRead(A1) + joyX_offset; // 0-1023
-  if (joystickX>1023) joystickX = 1023;
-  if (joystickX<0) joystickX = 0;
+  if (joystickX > 1023) joystickX = 1023;
+  if (joystickX < 0) joystickX = 0;
   if ( abs(joystickX - 512 ) < 5 ) joystickX = 512; // dead zone at center
-  
-  
-  
+
+
+
   //joystickX = 512;
   //Serial.println(joystickX);
-  
+
   int joyClick = !digitalRead(0); // 0 or 1
-  
-  
+
+
   // Filtering
   pitch_filtered = filterPitch(pitch);
   //joyX_filtered = filterJoyX(joystickX);
   //joyY_filtered = filterJoyY(joystickY);
-  
+
   //Serial.println(pitch_filtered);
   //Serial.println(joyX_filtered);
   //Serial.println(joyY_filtered);
-  
-  
+
+
   // mapped to 0-254 because 255 is defined as start of the packet. see serialSend4()
   int joystickY_0_254 = map(joystickY, 0, 1023, 0, 254);
   int joystickX_0_254 = map(joystickX, 0, 1023, 0, 254);
-  int pitch_0_254 = map(pitch_filtered, -90.0, 90.0, 0, 254); 
-      
+  int pitch_0_254 = map(pitch_filtered, -90.0, 90.0, 0, 254);
+
   //Serial.println(joystickY_0_254);
-  serialSend4(joystickY_0_254,joystickX_0_254,pitch_0_254,joyClick);
-  
+  serialSend4(joystickY_0_254, joystickX_0_254, pitch_0_254, joyClick);
+
   //  Serial.print(joystickY_0_254);
   //  Serial.print("\t");
   //  Serial.print(joystickX_0_254);
-  //  Serial.print("\t");  
+  //  Serial.print("\t");
   //  Serial.print(pitch_0_254);
-  //  Serial.print("\n"); 
+  //  Serial.print("\n");
 
   Bean.sleep(5);
 
@@ -240,13 +240,13 @@ float movingAverage() {
 */
 
 void serialSend4(int one, int two, int three, int four) {
-  
+
   Serial.write(255); // start byte
   Serial.write(one);
   Serial.write(two);
   Serial.write(three);
   Serial.write(four);
-  
+
 }
 
 
@@ -254,25 +254,25 @@ void calcPitchRoll(AccelerationReading acceleration) {
 
   //float pitch_roll[] = {0,0};
   //float pitch, roll;
-  
-  float ax,ay,az;
-  ax = acceleration.xAxis*g;
-  ay = acceleration.yAxis*g;
-  az = acceleration.zAxis*g;
-  
+
+  float ax, ay, az;
+  ax = acceleration.xAxis * g;
+  ay = acceleration.yAxis * g;
+  az = acceleration.zAxis * g;
+
   //Serial.println(acceleration.xAxis);
-  
+
   // http://physics.rutgers.edu/~aatish/teach/srr/workshop3.pdf
-  roll = -atan(ax/sqrt(pow(ay,2) + pow(az,2)));
-  pitch = atan(ay/sqrt(pow(ax,2) + pow(az,2)));
+  roll = -atan(ax / sqrt(pow(ay, 2) + pow(az, 2)));
+  pitch = atan(ay / sqrt(pow(ax, 2) + pow(az, 2)));
   //convert radians into degrees
-  pitch = pitch * (180.0/PI);
-  roll = roll * (180.0/PI);
-  
+  pitch = pitch * (180.0 / PI);
+  roll = roll * (180.0 / PI);
+
   //pitch_roll[0] = pitch;
   //pitch_roll[1] = roll;
-  
+
   //return pitch_roll;
-  
+
 }
 

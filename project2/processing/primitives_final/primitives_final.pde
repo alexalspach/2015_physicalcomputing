@@ -11,6 +11,7 @@
 import processing.serial.*;
 Serial myPort;  // Create object from Serial class
 
+boolean PITCH_CONTROL = false;
 
 // For camera motion
 float xaxis;
@@ -98,8 +99,13 @@ void draw () {
   
     input_fwd = map(cmd_fwd, 0, 254, -moveK_max, moveK_max);
     input_yaw = map(cmd_yaw, 0, 254, -rotateK_max, rotateK_max);
-    input_pitch = map(cmd_pitch, 0, 254, -rotateK_max, rotateK_max);
-  
+    if ( PITCH_CONTROL == true ) {
+      input_pitch = map(cmd_pitch, 0, 254, -rotateK_max, rotateK_max);
+    }
+    else {
+      input_pitch = 0.0;
+    }
+    
     if ( (center_scene == true) ) {
       resetCamera();
       center_scene = false;
@@ -145,12 +151,6 @@ float[] updateCamera(float moveKx, float moveKz, float rotateKpitch, float rotat
   return body_pose;
 }
 
-
-
-
-
-
-
 void mouseClicked() {
 
   int count = mouseEvent.getClickCount();
@@ -160,8 +160,6 @@ void mouseClicked() {
 
   //println(count);  // count is 2 for double click
 }
-
-
 
 void keyPressed() {
   if (key == ESC) {
@@ -176,13 +174,7 @@ void keyReleased() {
 }
 
 
-
-
-
-
-
 int randomBoxes(float[] body_pose) {
-
 
   if (switch_scene != false) {
     for (int i = 0; i < num_boxes; i++) {
