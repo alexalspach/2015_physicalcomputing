@@ -22,9 +22,9 @@ AccelerationReading acceleration;
 float roll, pitch;
 
 // Three low-pass filters
-const unsigned long pitch_windowSize = 3;
+int pitch_windowSize = 3;
 float pitch_data[pitch_windowSize];
-float pitch_total = 0.0;
+double pitch_total = 0.0;
 int pitch_dataIndex = 0;
 float pitch_filtered = 0.0;
 
@@ -127,7 +127,7 @@ void loop() {
 
 
   // Filtering
-  pitch_filtered = filterPitch(pitch);
+  //pitch_filtered = filterPitch(pitch);
   //joyX_filtered = filterJoyX(joystickX);
   //joyY_filtered = filterJoyY(joystickY);
 

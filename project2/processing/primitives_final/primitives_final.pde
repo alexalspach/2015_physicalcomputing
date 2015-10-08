@@ -11,7 +11,7 @@
 import processing.serial.*;
 Serial myPort;  // Create object from Serial class
 
-boolean PITCH_CONTROL = false;
+boolean PITCH_CONTROL = true;
 
 // For camera motion
 float xaxis;
@@ -66,12 +66,24 @@ color c = color(0, 0, 0);
 
 int command[] = {0,0,0,0};
 
+//pitch low pass filter
+int pitch_windowSize = 3;
+float[] pitch_data = new float[pitch_windowSize];
+float pitch_total = 0.0;
+int pitch_dataIndex = 0;
+float pitch_filtered = 0.0;
+
+
 void setup() {
   //fullScreen();
   size(1200, 800, P3D);
   surface.setResizable(true);
   myPort = new Serial(this, "/dev/cu.LightBlue-Bean", 9600);
   resetCamera();
+  
+  for (int thisReading = 0; thisReading < pitch_windowSize; thisReading++)
+    pitch_data[thisReading] = 0;
+    
 }
 
 
@@ -89,6 +101,12 @@ void draw () {
     cmd_yaw = command[1];
     cmd_pitch = command[2];
     cmd_clk = command[3];
+    
+    pitch_filtered = filterPitch(cmd_pitch);
+    cmd_pitch = int(pitch_filtered);
+    
+    //println(cmd_yaw);
+    println(cmd_pitch);
   
     //mouse mapping
     //float mouse_mappings[] = mouseMapping(); //  { forward velocity, rotational velocity } 0-255
@@ -341,6 +359,20 @@ float[] mouseMapping() {
   return mouse_mappings;
 }
 
+
+float filterPitch(float raw) {
+
+  pitch_total = pitch_total - pitch_data[pitch_dataIndex];
+  pitch_data[pitch_dataIndex] = raw;
+  pitch_total = pitch_total + pitch_data[pitch_dataIndex];
+  pitch_dataIndex = pitch_dataIndex + 1;
+
+  if (pitch_dataIndex >= pitch_windowSize)
+    pitch_dataIndex = 0;
+
+  return ( pitch_total / pitch_windowSize );
+
+}
 
 
 /*

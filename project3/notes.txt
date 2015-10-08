@@ -1,0 +1,15 @@
+Using Firmata with Arduino (or Teensy)
+
+Arduino > Examples > Firmata
+Upload to Arduino
+
+Test with Firmata Test App 
+http://firmata.org/wiki/Main_Page
+
+in Processing (3.x)
+Download Arduino (Firmata) library for Processing (2.x?)
+http://playground.arduino.cc/Interfacing/Processing
+
+Unzip and put folder ("arduino") into Processing Sketchbook folder
+default <user>/Documents/Processing
+(You can see this path in the Processing Prefs)
