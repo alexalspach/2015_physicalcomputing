@@ -96,7 +96,7 @@ void setup() {
   oscP5 = new OscP5(this,portIn);
 
   // set the remote location to be the localhost on port 5001
-  iPhone = new NetAddress("192.168.1.7",portIn);
+  iPhone = new NetAddress("128.237.130.237",portIn);
   
   
   /* FIRMATA */
