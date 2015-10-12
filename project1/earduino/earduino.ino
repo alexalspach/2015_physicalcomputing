@@ -1,7 +1,7 @@
 
 const boolean DEBUG = false;
 const boolean BUZZERS = true;
-const boolean SHOW = false;
+const boolean SHOW = true;
 
 const boolean PRINT_LEDS = false;
 
