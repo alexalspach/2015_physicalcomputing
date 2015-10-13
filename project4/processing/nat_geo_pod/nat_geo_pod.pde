@@ -8,6 +8,9 @@ String imgPath = "";
 
 void setup() {
   
+  size(990,742);
+  surface.setResizable(true);
+  
   if ( DOWNLOAD == true ) {
   String url = "http://images.nationalgeographic.com/wpf/media-live/photos/000/921/cache/gullfoss-waterfall-iceland-ngpc2015_92122_990x742.jpg";
   // Load image from a web server
@@ -25,8 +28,7 @@ void setup() {
   image(img, 0, 0);
   
   println(img.width, img.height);
-  size(990,742);
-  surface.setResizable(true);
+
 
   }
   
